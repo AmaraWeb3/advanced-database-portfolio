@@ -1,0 +1,73 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20261113072344
+Username: NOCODE-AMARA\SHUGAH
+RunAs User: NOCODE-AMARA\SHUGAH
+Configuration Name: 
+Machine: NOCODE-AMARA (Microsoft Windows NT 10.0.26300.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Process ID: 43356
+PSVersion: 5.1.26100.9818
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9818
+BuildVersion: 10.0.26100.9818
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is C:\Users\SHUGAH\OneDrive\Documents\GitHub\advanced-database-portfolio\portfolio-5-distributed-cloud\05_demo_log.txt
+PS C:\WINDOWS\System32> docker network create library-net
+
+PS C:\WINDOWS\System32> docker run -d --name mongo1 --network library-net mongo:7 --replSet rs0 --bind_ip_all
+
+PS C:\WINDOWS\System32> docker run -d --name mongo2 --network library-net mongo:7 --replSet rs0 --bind_ip_all
+
+PS C:\WINDOWS\System32> docker run -d --name mongo3 --network library-net mongo:7 --replSet rs0 --bind_ip_all
+
+PS C:\WINDOWS\System32> docker ps
+
+PS C:\WINDOWS\System32> $dir = "C:\Users\SHUGAH\OneDrive\Documents\GitHub\advanced-database-portfolio\portfolio-5-distributed-cloud"
+PS C:\WINDOWS\System32> foreach ($n in "mongo1","mongo2","mongo3") { foreach ($f in "01_replica_init.js","02_rs_status.js","03_write.js","04_read_node.js") { docker cp "$dir\$f" "${n}:/tmp/$f" } }
+
+
+
+
+
+
+
+
+
+
+
+
+PS C:\WINDOWS\System32> docker exec -it mongo1 mongosh --quiet --file /tmp/01_replica_init.js
+
+PS C:\WINDOWS\System32> Start-Sleep -Seconds 10
+PS C:\WINDOWS\System32> docker exec -it mongo2 mongosh --quiet --file /tmp/02_rs_status.js
+
+PS C:\WINDOWS\System32> docker exec -it mongo2 mongosh --quiet "mongodb://mongo2:27017,mongo3:27017/?replicaSet=rs0" --file /tmp/03_write.js
+
+PS C:\WINDOWS\System32> docker exec -it mongo2 mongosh --quiet --file /tmp/04_read_node.js
+
+PS C:\WINDOWS\System32> docker exec -it mongo3 mongosh --quiet --file /tmp/04_read_node.js
+
+PS C:\WINDOWS\System32> docker stop mongo1
+
+PS C:\WINDOWS\System32> Start-Sleep -Seconds 15
+PS C:\WINDOWS\System32> docker exec -it mongo2 mongosh --quiet --file /tmp/02_rs_status.js
+
+PS C:\WINDOWS\System32> docker exec -it mongo2 mongosh --quiet "mongodb://mongo2:27017,mongo3:27017/?replicaSet=rs0" --file /tmp/03_write.js
+
+PS C:\WINDOWS\System32> docker start mongo1
+
+PS C:\WINDOWS\System32> Start-Sleep -Seconds 20
+PS C:\WINDOWS\System32> docker exec -it mongo2 mongosh --quiet --file /tmp/02_rs_status.js
+
+PS C:\WINDOWS\System32> docker exec -it mongo1 mongosh --quiet --file /tmp/04_read_node.js
+
+PS C:\WINDOWS\System32> Stop-Transcript
+**********************
+Windows PowerShell transcript end
+End time: 20261113074427
+**********************
