@@ -14,7 +14,7 @@ MongoDB (document database), run in a Docker container using the mongo:7 image a
 
 ## Data model
 | Relational design (Portfolio 1) | MongoDB design |
-|---|---|
+
 | book, author, book_author, book_copy | books collection, with authors and copies embedded in each book document |
 | member, loan | members collection, with each member's loans embedded |
 | category | a category field inside each book document |
@@ -22,7 +22,7 @@ MongoDB (document database), run in a Docker container using the mongo:7 image a
 
 ## Queries tested
 | Query | What it shows |
-|---|---|
+
 | Q1 | Filter by category |
 | Q2 | Filter inside an embedded array (books with an available copy) |
 | Q3 | A member's full loan history in one read |
@@ -32,21 +32,25 @@ MongoDB (document database), run in a Docker container using the mongo:7 image a
 | Q6 | Borrowing a book: two updates (copy status and the member's loans) |
 
 ## Why a document model suits this case study
-(Write this in your own words. Points to cover:)
-- A catalogue page needs a title, its authors and its copies together. Embedding returns them in one read, with no joins.
-- A member's history is also one read.
-- Documents can carry different fields, for example an e-book with a download link, without changing a table.
+- MongoDB's document model suits the library catalogue because related information can be stored together in one document. 
+- For example, a book's title, authors, and available copies can be retrieved in a single read without joining multiple tables. 
+- Similarly, a member's loan history can be accessed directly from their document. 
+- The flexible structure also makes it easier to store different types of information, such as a download link for an e-book, without having to change a fixed table structure.
 
 ## Where it does not suit
-(Write this in your own words. Points to cover:)
-- Borrowing a book updates two documents. On a standalone MongoDB server each single-document write is atomic, but the pair is not, unlike the PostgreSQL transaction in Portfolio 3. Multi-document transactions need a replica set.
-- The book title is copied into every loan, so a title change has to be updated in many places.
-- A member's loans array grows without limit, and a document has a size cap, so a real system would store loans separately.
-- Reports across all loans are easier in SQL.
+- Although the document model offers flexibility, it also has some limitations in this case study. 
+- Borrowing a book involves updating two separate documents: the book's copy status and the member's loan history. 
+- While each individual document update is atomic, the two updates are not automatically treated as one transaction on a standalone MongoDB server. 
+- Multi-document transactions require a replica set.
+
+- Another limitation is data duplication. Since the book title is stored in each loan record, changing a title may require updating several records. 
+- Also, embedding all a member's loans in one array could eventually make the document too large, especially as the library grows. 
+- For a real-world system, storing loans in a separate collection would be more suitable. 
+- Finally, complex reports involving all loan records may be easier to produce using SQL.
 
 ## Conclusion
-(1 or 2 sentences in your own words. For example: a hybrid design, with PostgreSQL for loans and fines
-that need strict transactions, and MongoDB for catalogue search and member history reads.)
+MongoDB is useful for the library catalogue and retrieving member information, but it has limitations when handling transactions and reports involving multiple records. 
+A hybrid approach could work better, using PostgreSQL for loans and fines that require strict transactions, and MongoDB for catalogue searches and member history retrieval.
 
 ## Limitations
 The dataset is small (4 books, 3 members), so I make no performance claims. The index plan only
