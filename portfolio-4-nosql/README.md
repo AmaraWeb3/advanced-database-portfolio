@@ -14,7 +14,7 @@ MongoDB (document database), run in a Docker container using the mongo:7 image a
 
 ## Data model
 | Relational design (Portfolio 1) | MongoDB design |
-
+|----|-------|
 | book, author, book_author, book_copy | books collection, with authors and copies embedded in each book document |
 | member, loan | members collection, with each member's loans embedded |
 | category | a category field inside each book document |
@@ -22,7 +22,7 @@ MongoDB (document database), run in a Docker container using the mongo:7 image a
 
 ## Queries tested
 | Query | What it shows |
-
+|----|-------|
 | Q1 | Filter by category |
 | Q2 | Filter inside an embedded array (books with an available copy) |
 | Q3 | A member's full loan history in one read |
